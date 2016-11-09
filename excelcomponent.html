@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" type="text/css" href="table.css">
+    <link rel="stylesheet" type="text/css" href="table2.css">
     <title>Excel</title>
     <script src="https://unpkg.com/react@latest/dist/react.js"></script>
     <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
@@ -44,9 +44,9 @@
 
                 //ascending sort by default, unless index of current sortby column is the same as new
                 if (this.state.sortby === column) {
-                    descending = true;
+                    descending = !this.state.descending;
                 } else {
-                    descending = false;
+                    descending = this.state.descending;
                 }
 
                 data.sort(function (a, b) {
