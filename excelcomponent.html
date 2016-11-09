@@ -28,20 +28,40 @@
                     )
                 ),
             },
+            
             getInitialState() {
                 return {
-                    data: this.props.initialData
+                    data: this.props.initialData,
+                    sortby: null,
+                    descending: false,
                 };
             },
 
             _sort: function (e) {
                 var column = e.target.cellIndex;
-                var data = this.state.data.slice(); 
-                data.sort(function(a,b) {
-                   return a[column] > b[column] ? 1 : -1; 
+                var data = this.state.data.slice();
+                var descending;
+
+                //ascending sort by default, unless index of current sortby column is the same as new
+                if (this.state.sortby === column) {
+                    descending = true;
+                } else {
+                    descending = false;
+                }
+
+                data.sort(function (a, b) {
+                    if (descending) {
+                        return a[column] < b[column] ? 1 : -1;
+                    } else {
+                        return a[column] > b[column] ? 1 : -1;
+                    }
                 });
-                
-                this.setState({data: data, });
+
+                this.setState({
+                    data: data,
+                    sortby: column,
+                    descending: descending
+                });
             },
 
             render: function () {
@@ -52,10 +72,14 @@
                             },
                             React.DOM.tr(null,
                                 this.props.headers.map(function (title, idx) {
+                                    if (this.state.sortby === idx) {
+                                        title += this.state.descending ? ' \u2191' : ' \u2193';
+                                    }
+
                                     return React.DOM.th({
                                         key: idx
                                     }, title);
-                                })
+                                }, this)
                             )
                         ),
                         React.DOM.tbody(null,
