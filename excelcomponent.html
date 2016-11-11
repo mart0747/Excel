@@ -37,6 +37,7 @@
                     descending: false,
                     edit: null, // {row: index, cell: index}
                     search: false,
+                    searchbutton: "search",
                 };
             },
 
@@ -152,7 +153,7 @@
                 return React.DOM.button({
                     onClick: this._toggleSearch,
                     className: 'toolbar',
-                }, 'search');
+                }, this.state.searchbutton);
             },
 
             _renderSearch: function () {
@@ -178,12 +179,14 @@
             _toggleSearch : function() {
                 if(this.state.search) {
                     this.setState({ data: this._preSearchData, 
-                                  search: false,});
+                                  search: false,
+                                  searchbutton: "search"});
                     this._preSearchData = null; 
                 } else {
                     this._preSearchData = this.state.data;
                     this.setState({
                         search: true,
+                        searchbutton: "clear search",
                     });
                 }
             }, 
