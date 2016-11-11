@@ -17,7 +17,8 @@
     <script>
         var Excel = React.createClass({
             displayName: 'Excel',
-
+            _preSearchData: null, 
+            
             propTypes: {
                 headers: React.PropTypes.arrayOf(
                     React.PropTypes.string
@@ -35,9 +36,17 @@
                     sortby: null,
                     descending: false,
                     edit: null, // {row: index, cell: index}
+                    search: false,
                 };
             },
 
+            render: function () {
+                return (
+                    React.DOM.div(null,
+                        this._renderToolbar(), this._renderTable())
+                );
+            },
+            
             _sort: function (e) {
                 var column = e.target.cellIndex;
                 var data = this.state.data.slice();
@@ -74,16 +83,19 @@
                 });
             },
 
-            _save: function(e) {
-                e.preventDefault();  
+            _save: function (e) {
+                e.preventDefault();
                 var input = e.target.firstChild;
-                var data = this.state.data.slice(); 
+                var data = this.state.data.slice();
                 data[this.state.edit.row][this.state.edit.cell] = input.value;
-                
-                this.setState({edit: null, data: data});
-            }, 
-            
-            render: function () {
+
+                this.setState({
+                    edit: null,
+                    data: data
+                });
+            },
+
+            _renderTable: function () {
                 return (
                     React.DOM.table(null,
                         React.DOM.thead({
@@ -104,6 +116,7 @@
                         React.DOM.tbody({
                                 onDoubleClick: this._showEditor
                             },
+                            this._renderSearch(),
                             this.state.data.map(function (row, rowidx) {
                                 return (
                                     React.DOM.tr({
@@ -112,7 +125,7 @@
                                         row.map(function (cell, idx) {
                                             var content = cell;
                                             var edit = this.state.edit;
-                                        
+
                                             if (edit && edit.row === rowidx && edit.cell === idx) {
                                                 content = React.DOM.form({
                                                     onSubmit: this._save
@@ -133,7 +146,48 @@
                         )
                     )
                 );
-            }
+            },
+
+            _renderToolbar: function () {
+                return React.DOM.button({
+                    onClick: this._toggleSearch,
+                    className: 'toolbar',
+                }, 'search');
+            },
+
+            _renderSearch: function () {
+                if (!this.state.search) {
+                    return null;
+                }
+
+                return (
+                    React.DOM.tr({
+                            onChange: this._search
+                        },
+                        this.props.headers.map(function (_ignore, idx) {
+                            return React.DOM.td({
+                                key: idx
+                            }, React.DOM.input({
+                                type: 'text',
+                                'data-idx': idx,
+                            }));
+                        }))
+                );
+            },
+
+            _toggleSearch : function() {
+                if(this.state.search) {
+                    this.setState({ data: this._preSearchData, 
+                                  search: false,});
+                    this._preSearchData = null; 
+                } else {
+                    this._preSearchData = this.state.data;
+                    this.setState({
+                        search: true,
+                    });
+                }
+            }, 
+            
         });
 
         var headers = [
@@ -158,7 +212,6 @@
             document.getElementById("app")
         );
     </script>
-
 </body>
 
 </html>
